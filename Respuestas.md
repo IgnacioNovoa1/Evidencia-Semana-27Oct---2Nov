@@ -1,105 +1,126 @@
-**Nombre:** Ramón Novoa
-**Matricula:** 21891216824
-1. Mejora de la clase Persona (Generalización)
+# Guía de trabajo - Implicancias de la Herencia
 
-Pregunta: Considere que la clase Persona es lo suficientemente abstracta para permitir representar elementos propios del dominio problema ¿Qué podría hacer para mejorar aquello?
+**Nombre: Ramón Novoa**
+**Matricula: 21891216824**
 
-Respuesta: La forma de "mejorar" una clase que es demasiado genérica (abstracta) para representar elementos específicos del dominio es usar Herencia (Generalización).
+## 1.  Considere que la clase Persona es lo suficientemente abstracta para permitir representar elementos propios del dominio problema ¿Qué podría hacer para mejorar aquello?
 
-En nuestros casos, tenemos Persona como un concepto base, pero en la realidad tenemos tipos específicos de personas:
+La clase `Persona` se puede hacer más abstracta para representar de mejor forma los elementos comunes del contexto.  
+Esto se logra convirtiéndola en una **superclase abstracta**, que contenga los atributos y métodos generales que comparten todas las personas, y luego crear **subclases** más específicas que hereden de ella.
 
-    En el Caso 1, tenemos "Niños" (Sofía, Pablo, Pedro).
+Por ejemplo:
 
-    En el Caso 2, tenemos "Empleados" (Agustín, Francisco) y personas que no son empleadas (Andrea).
+```java
+abstract class Persona {
+    protected String nombre;
+    protected int edad;
 
-Solución: Se crea la clase Persona como una superclase (clase padre) que contiene atributos comunes como nombre y edad. Luego, se crean subclases (clases hijas) que heredan de Persona y añaden sus propias características o relaciones:
+    public abstract void presentarse();
+}
 
-    class Niño extends Persona { ... } (Puede tener relaciones específicas como "asiste a Escuela").
+class Niño extends Persona {
+    private String escuela;
 
-    class Empleado extends Persona { ... } (Tiene una relación "trabaja en" Departamento).
+    @Override
+    public void presentarse() {
+        System.out.println("Hola, soy un niño y voy a la escuela " + escuela);
+    }
+}
+```
 
-De esta forma, Persona sigue siendo una abstracción útil, pero podemos modelar las diferencias específicas del dominio.
+De esta forma, `Persona` actúa como una clase base que puede extenderse con diferentes tipos de personas (niños, empleados, profesores, etc.), mejorando la **reutilización** y **organización** del código.
 
-2. Generalización de Animales (Caso 1)
+## 2. ¿Cómo podría en el Caso1 representar una situación más genérica para el caso de los animales?
 
-Pregunta: ¿Cómo podría en el Caso1 representar una situación más genérica para el caso de los animales?
+Para representar una situación más genérica en el caso de los animales, se puede crear una **superclase `Animal`** que defina los comportamientos comunes como `comer()` o `hacerSonido()`.  
+Luego, las clases `Perro` y `Gato` heredan de `Animal` y personalizan su comportamiento.
 
-Respuesta: Aplicando el mismo concepto de Herencia. En el Caso 1, tenemos un "perro" (ladra, come) y un "gato" (muerde, rasguña).
+```java
+abstract class Animal {
+    protected String nombre;
+    protected String color;
 
-En lugar de crear dos clases separadas e inconexas, creamos una superclase Animal.
+    public abstract void hacerSonido();
+    public void comer() {
+        System.out.println(nombre + " está comiendo.");
+    }
+}
 
-    Superclase Animal: Contendría atributos comunes (ej. nombre: String, color: String) y métodos comunes (ej. comer(): void).
+class Perro extends Animal {
+    @Override
+    public void hacerSonido() {
+        System.out.println("Guau guau!");
+    }
+}
 
-    Subclases Perro y Gato:
+class Gato extends Animal {
+    @Override
+    public void hacerSonido() {
+        System.out.println("Miau!");
+    }
+}
+```
 
-        class Perro extends Animal { ... }
+Con esta estructura, se puede agregar fácilmente cualquier otro tipo de animal sin duplicar código, manteniendo un modelo más escalable y genérico.
 
-            Añade su método específico: ladrar(): void.
+## 3. Si consideramos ahora que una universidad no se encuentra compuesta de carreras sino que se compone de facultades y éstas a su vez se conforman de departamentos independientes. ¿Cómo cambia eso sus diagramas de clases?
 
-        class Gato extends Animal { ... }
+Originalmente, la estructura podía ser algo como:
 
-            Añade sus métodos específicos: morder(): void, rasguñar(): void.
+```
+Universidad ──► Carrera ──► Estudiante
+```
 
-Esto nos permite tratar a todos como "Animales" (polimorfismo), a la vez que respetamos sus comportamientos únicos y evitamos duplicar código.
+Pero al considerar que la universidad está compuesta por **facultades**, y estas a su vez por **departamentos**, el diagrama cambia a:
 
-3. Modelado de Universidad (Composición)
+```
+Universidad ──► Facultad ──► Departamento ──► Estudiante / Profesor / Curso
+```
 
-Pregunta: Si consideramos ahora que una universidad no se encuentra compuesta de carreras sino que se compone de facultades y éstas a su vez se conforman de departamentos independientes. ¿Cómo cambia eso sus diagramas de clases?
+**Cambios principales:**
+- `Universidad` ahora tiene una relación de **composición** con `Facultad`.
+- `Facultad` tiene una **composición** con `Departamento`.
+- `Departamento` se relaciona con `Persona` (ya que puede tener estudiantes y profesores).
 
-Respuesta: Esto cambia la relación a una Composición Anidada. La palabra clave es "se compone de" (o "se conforma de"), lo que implica una relación "parte-todo" donde las partes no pueden existir sin el todo.
+Esto mejora la representación jerárquica y hace el modelo más fiel a la estructura real de una universidad.
 
-En UML, esto se modela con un rombo relleno (◆) en el lado del "todo".
+## 4. Aplicando el mismo razonamiento anterior ¿Cómo se podría generalizar el análisis hecho en el Caso2 en la clase Persona, Moto y Empresa Naviera?
 
-Así cambia el diagrama:
+En el Caso 2, se pueden aplicar los mismos principios de **herencia** y **generalización** para simplificar y hacer el modelo más reutilizable.
 
-    Se crea una relación de Composición entre Universidad y Facultad.
+- La clase `Persona` puede ser una superclase de `Empleado` o `Cliente`.
+- La clase `Moto` puede heredar de una clase más genérica llamada `Vehiculo`.
+- La `EmpresaNaviera` puede extender una clase base `Empresa`.
 
-        La Universidad es el "todo"; la Facultad es la "parte".
+Ejemplo de código:
 
-        Lógica: Si la Universidad deja de existir, sus Facultades también.
+```java
+class Empresa {
+    protected String nombre;
+    protected String direccion;
+}
 
-    Se crea una segunda relación de Composición entre Facultad y Departamento.
+class EmpresaNaviera extends Empresa {
+    private List<Departamento> departamentos;
+}
 
-        La Facultad es el "todo"; el Departamento es la "parte".
+class Persona {
+    protected String nombre;
+}
 
-        Lógica: Si la Facultad es eliminada, sus Departamentos también.
+class Empleado extends Persona {
+    private String cargo;
+    private Departamento departamento;
+}
 
-El diagrama mostraría una cadena de composición:
+abstract class Vehiculo {
+    protected String marca;
+    protected String modelo;
+}
 
-4. Generalización del Caso 2
+class Moto extends Vehiculo {
+    private int cilindrada;
+}
+```
 
-Pregunta: Aplicando el mismo razonamiento anterior ¿Cómo se podría generalizar el análisis hecho en el Caso2 en la clase Persona, Moto y Empresa Naviera?
-
-Respuesta: Aquí aplicamos tanto la Herencia (como en Persona) como la Abstracción (para Moto y Empresa).
-
-    Clase Persona:
-
-        Como se mencionó en el punto 1, la generalizamos usando Herencia. Persona es la superclase, y Empleado es la subclase. Agustín y Francisco son instancias de Empleado, mientras que Andrea es una instancia de Persona.
-
-    Clase Moto:
-
-        Tenemos "Harley Davidson 1200" y "Kawasaki Ninja".
-
-        No creamos una clase HarleyDavidson y otra KawasakiNinja.
-
-        Solución (Abstracción): Creamos una única clase llamada Moto. Las diferencias se manejan con atributos, no con clases.
-
-            class Moto {
-
-            marca: String
-
-            modelo: String
-
-            }
-
-        La moto de Agustín es una instancia de Moto (marca="Harley Davidson", modelo="1200 Custom").
-
-        La moto de Andrea es otra instancia (marca="Kawasaki", modelo="Ninja ZX 6R").
-
-    Clase Empresa Naviera:
-
-        El texto menciona "Tesoros del Mar S.A.".
-
-        Solución (Abstracción): Igual que con Moto. La clase no se llama "TesorosDelMar", la clase se llama EmpresaNaviera. "Tesoros del Mar S.A." es el valor del atributo nombre de una instancia de esa clase.
-
-        Solución (Composición): El "mismo razonamiento" de la Universidad aplica aquí. La EmpresaNaviera "se compone de" Departamentos. Por lo tanto, usaríamos una relación de Composición (◆) entre EmpresaNaviera y Departamento.
+Este modelo permite agregar nuevos tipos de empresas, personas o vehículos sin alterar las clases existentes, lo que mejora la **extensibilidad** y el **mantenimiento del sistema**.
